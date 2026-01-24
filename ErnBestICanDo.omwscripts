@@ -1,0 +1,4 @@
+MENU: scripts/ErnBestICanDo/menu_settings.lua
+
+PLAYER: scripts/ErnBestICanDo/player.lua
+GLOBAL: scripts/ErnBestICanDo/global.lua

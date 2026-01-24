@@ -1,0 +1,11 @@
+name: "Best I Can Do"
+description: "Limit merchant max gold."
+settings: "Settings"
+
+debugName: "Debug Mode"
+
+constGoldName: "Gold Constant Term"
+constGoldDescription: "Base amount of gold merchants won't exceed."
+
+mercMultGoldName: "Gold Multiplied by Mercantile"
+mercMultGoldDescription: "Additional gold merchants have, based on your Mercantile skill."
