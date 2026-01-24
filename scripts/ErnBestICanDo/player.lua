@@ -31,7 +31,8 @@ local async      = require("openmw.async")
 local settingCache = {
     constGold = settings.main.constGold,
     mercMultGold = settings.main.mercMultGold,
-    mercSquareMultGold = settings.main.mercSquareMultGold
+    mercSquareMultGold = settings.main.mercSquareMultGold,
+    additionalOnlyGold = settings.main.additionalOnlyGold
 }
 settings.main.subscribe(async:callback(function(_, key)
     settingCache[key] = settings.main[key]
@@ -43,7 +44,8 @@ local function messageData(npc)
         npc = npc,
         player = pself,
         maxGold = math.ceil(settingCache.constGold + mercSkill * settingCache.mercMultGold +
-            mercSkill * mercSkill * settingCache.mercSquareMultGold)
+            mercSkill * mercSkill * settingCache.mercSquareMultGold),
+        additionalOnlyGold = settingCache.additionalOnlyGold,
     }
 end
 
@@ -58,7 +60,6 @@ local function UiModeChanged(data)
 end
 
 local function onReOpenBarterWindow(data)
-    --print("re-open barter")
     interfaces.UI.removeMode('Barter')
     interfaces.UI.addMode('Barter', data)
 end

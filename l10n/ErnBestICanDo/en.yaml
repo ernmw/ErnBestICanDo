@@ -13,3 +13,6 @@ mercMultGoldDescription: "Additional gold merchants have, based on your Mercanti
 
 mercSquareMultGoldName: "Gold Multiplied by Mercantile^2"
 mercSquareMultGoldDescription: "Additional gold merchants have, based on the square of your Mercantile skill."
+
+additionalOnlyGoldName: "Softmax Mode"
+additionalOnlyGoldDescription: "When enabled, the merchant's original base barter gold will be added to the formula."
