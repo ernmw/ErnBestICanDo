@@ -20,31 +20,75 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- Interact with it via the interface it exposes.
 
 local MOD_NAME = require("scripts.ErnBestICanDo.ns")
+local core     = require("openmw.core")
+local async    = require("openmw.async")
 
+
+if require("openmw.core").API_REVISION < 111 then
+    error("OpenMW 0.51 or newer is required!")
+    return
+end
+
+-- 24.0
+local resetTime = core.getGMST("fBarterGoldResetDelay")
+
+local persist = {
+    originalValuesMap = {},
+}
+
+-- currently-trading NPCs.
 local tradingNPCs = {}
 
+local resetCallback = async:registerTimerCallback("resetCallback", function(data)
+    local npc = data.npc
+    local originalGold = data.originalGold
+    print("Restoring gold for " .. npc.recordId .. " to " .. tostring(originalGold))
+    npc.type.setBarterGold(npc, originalGold)
+end)
+
+local function ensureTimer(npc)
+    local originalGold = persist.originalValuesMap[npc.id]
+    if originalGold then
+        async:newGameTimer(resetTime * 60 * 60, resetCallback, {
+            npc = npc,
+            originalGold = persist.originalValuesMap[npc.id],
+        })
+    end
+end
+
 local function onBarterStart(data)
-    tradingNPCs[data.player.id] = data
+    if data.npc then
+        tradingNPCs[data.player.id] = data
+    end
 end
 
 local function onBarterEnd(data)
+    if tradingNPCs[data.player.id] and tradingNPCs[data.player.id].npc then
+        ensureTimer(tradingNPCs[data.player.id].npc)
+    end
+
     tradingNPCs[data.player.id] = nil
 end
 
 local function limitGold(data)
-    local inventory = data.npc.type.inventory(data.npc)
-    local gold = inventory:find("gold_001")
-    if not gold then
-        print("no gold!")
+    local currentGold = data.npc.type.getBarterGold(data.npc)
+
+    if not currentGold then
         return
     end
-    -- https://en.uesp.net/wiki/Morrowind_Mod:Alphabetical_Function_List
-    -- inventory gold != barter gold.
-    print("found gold: " .. tostring(gold.count))
-    if gold.count > data.maxGold then
-        print("removing excess gold (" .. tostring(gold.count) .. ") down to max: " .. tostring(data.maxGold))
-        gold:remove(gold.count - data.maxGold)
+
+    -- save off original amount before we start messing with it.
+    if not persist.originalValuesMap[data.npc.id] then
+        persist.originalValuesMap[data.npc.id] = currentGold
     end
+
+    -- Help please!
+    -- The unexpected behavior is that currentGold isn't changing when I sell items.
+    -- TODO: remove debug print
+    print("current: " ..
+        tostring(currentGold) ..
+        ", original: " .. tostring(persist.originalValuesMap[data.npc.id]) .. ", max: " .. tostring(data.maxGold))
+    data.npc.type.setBarterGold(data.npc, math.min(currentGold, persist.originalValuesMap[data.npc.id], data.maxGold))
 end
 
 local function onUpdate(dt)
@@ -55,6 +99,15 @@ local function onUpdate(dt)
     end
 end
 
+local function onLoad(data)
+    if data then
+        persist = data
+    end
+end
+local function onSave()
+    return persist
+end
+
 return {
     eventHandlers = {
         [MOD_NAME .. "onBarterStart"] = onBarterStart,
@@ -62,5 +115,7 @@ return {
     },
     engineHandlers = {
         onUpdate = onUpdate,
+        onLoad = onLoad,
+        onSave = onSave,
     }
 }

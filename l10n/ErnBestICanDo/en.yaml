@@ -1,5 +1,6 @@
 name: "Best I Can Do"
 description: "Limit merchant max gold."
+minVersion: "OpenMW 0.51 or newer is required! The mod will not work for you."
 settings: "Settings"
 
 debugName: "Debug Mode"

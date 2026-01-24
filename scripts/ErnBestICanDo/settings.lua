@@ -27,7 +27,7 @@ local function init()
         key = MOD_NAME,
         l10n = MOD_NAME,
         name = "name",
-        description = "description",
+        description = (require("openmw.core").API_REVISION >= 111) and "description" or "minVersion",
     }
 
     interfaces.Settings.registerGroup {

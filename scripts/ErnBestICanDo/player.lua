@@ -48,7 +48,7 @@ local function messageData(npc)
 end
 
 local function UiModeChanged(data)
-    if data.newMode == "Barter" then
+    if data.newMode == "Barter" or data.newMode == "Dialogue" then
         core.sendGlobalEvent(MOD_NAME .. "onBarterStart", messageData(data.arg))
     elseif data.oldMode == "Barter" then
         core.sendGlobalEvent(MOD_NAME .. "onBarterEnd", messageData(data.arg))
