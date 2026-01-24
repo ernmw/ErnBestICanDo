@@ -10,3 +10,6 @@ constGoldDescription: "Base amount of gold merchants won't exceed."
 
 mercMultGoldName: "Gold Multiplied by Mercantile"
 mercMultGoldDescription: "Additional gold merchants have, based on your Mercantile skill."
+
+mercSquareMultGoldName: "Gold Multiplied by Mercantile^2"
+mercSquareMultGoldDescription: "Additional gold merchants have, based on the square of your Mercantile skill."

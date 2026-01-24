@@ -44,8 +44,8 @@ local function init()
                 default = 500,
                 renderer = "number",
                 argument = {
-                    integer = true,
-                    min = 0,
+                    integer = false,
+                    min = -5000,
                     max = 5000,
                 }
             },
@@ -56,8 +56,20 @@ local function init()
                 default = 10,
                 renderer = "number",
                 argument = {
-                    integer = true,
-                    min = 0,
+                    integer = false,
+                    min = -5000,
+                    max = 5000,
+                }
+            },
+            {
+                key = "mercSquareMultGold",
+                name = "mercSquareMultGoldName",
+                description = "mercSquareMultGoldDescription",
+                default = 0,
+                renderer = "number",
+                argument = {
+                    integer = false,
+                    min = -5000,
                     max = 5000,
                 }
             },

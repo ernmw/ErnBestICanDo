@@ -30,7 +30,8 @@ local async      = require("openmw.async")
 
 local settingCache = {
     constGold = settings.main.constGold,
-    mercMultGold = settings.main.mercMultGold
+    mercMultGold = settings.main.mercMultGold,
+    mercSquareMultGold = settings.main.mercSquareMultGold
 }
 settings.main.subscribe(async:callback(function(_, key)
     settingCache[key] = settings.main[key]
@@ -41,7 +42,8 @@ local function messageData(npc)
     return {
         npc = npc,
         player = pself,
-        maxGold = settingCache.constGold + mercSkill * settingCache.mercMultGold,
+        maxGold = math.ceil(settingCache.constGold + mercSkill * settingCache.mercMultGold +
+            mercSkill * mercSkill * settingCache.mercSquareMultGold)
     }
 end
 
