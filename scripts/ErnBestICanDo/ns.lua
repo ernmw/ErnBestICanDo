@@ -1,5 +1,5 @@
 --[[
-LivelyMap for OpenMW.
+ErnBestICanDo for OpenMW.
 Copyright (C) Erin Pentecost 2026
 
 This program is free software: you can redistribute it and/or modify
