@@ -74,6 +74,13 @@ local function init()
                 }
             },
             {
+                key = "additionalOnlyGold",
+                name = "additionalOnlyGoldName",
+                description = "additionalOnlyGoldDescription",
+                default = false,
+                renderer = "checkbox"
+            },
+            {
                 key = "debug",
                 name = "debugName",
                 default = false,
