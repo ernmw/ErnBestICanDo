@@ -19,15 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- This file is in charge of tracking and exposing path information.
 -- Interact with it via the interface it exposes.
 
-local MOD_NAME = require("scripts.ErnBestICanDo.ns")
-local types    = require('openmw.types')
-local core     = require('openmw.core')
-local pself    = require("openmw.self")
-local util     = require("openmw.util")
-local vfs      = require('openmw.vfs')
-local aux_util = require('openmw_aux.util')
-local settings = require("scripts.ErnBestICanDo.settings")
-local async    = require("openmw.async")
+local MOD_NAME   = require("scripts.ErnBestICanDo.ns")
+local types      = require('openmw.types')
+local core       = require('openmw.core')
+local pself      = require("openmw.self")
+local interfaces = require("openmw.interfaces")
+local settings   = require("scripts.ErnBestICanDo.settings")
+local async      = require("openmw.async")
 
 
 local settingCache = {
@@ -48,15 +46,24 @@ local function messageData(npc)
 end
 
 local function UiModeChanged(data)
-    if data.newMode == "Barter" or data.newMode == "Dialogue" then
-        core.sendGlobalEvent(MOD_NAME .. "onBarterStart", messageData(data.arg))
-    elseif data.oldMode == "Barter" then
-        core.sendGlobalEvent(MOD_NAME .. "onBarterEnd", messageData(data.arg))
+    if not data.arg then
+        return
     end
+    -- need to change gold before the barter window actually comes up.
+    if (data.newMode == "Barter") then
+        core.sendGlobalEvent(MOD_NAME .. "onBarterStart", messageData(data.arg))
+    end
+end
+
+local function onReOpenBarterWindow(data)
+    --print("re-open barter")
+    interfaces.UI.removeMode('Barter')
+    interfaces.UI.addMode('Barter', data)
 end
 
 return {
     eventHandlers = {
+        [MOD_NAME .. "onReOpenBarterWindow"] = onReOpenBarterWindow,
         UiModeChanged = UiModeChanged
     },
 }

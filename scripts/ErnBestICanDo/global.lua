@@ -36,9 +36,6 @@ local persist = {
     originalValuesMap = {},
 }
 
--- currently-trading NPCs.
-local tradingNPCs = {}
-
 local resetCallback = async:registerTimerCallback("resetCallback", function(data)
     local npc = data.npc
     local originalGold = data.originalGold
@@ -56,20 +53,6 @@ local function ensureTimer(npc)
     end
 end
 
-local function onBarterStart(data)
-    if data.npc then
-        tradingNPCs[data.player.id] = data
-    end
-end
-
-local function onBarterEnd(data)
-    if tradingNPCs[data.player.id] and tradingNPCs[data.player.id].npc then
-        ensureTimer(tradingNPCs[data.player.id].npc)
-    end
-
-    tradingNPCs[data.player.id] = nil
-end
-
 local function limitGold(data)
     local currentGold = data.npc.type.getBarterGold(data.npc)
 
@@ -81,22 +64,28 @@ local function limitGold(data)
     if not persist.originalValuesMap[data.npc.id] then
         persist.originalValuesMap[data.npc.id] = currentGold
     end
+    local originalGold = persist.originalValuesMap[data.npc.id]
 
-    -- Help please!
-    -- The unexpected behavior is that currentGold isn't changing when I sell items.
-    -- TODO: remove debug print
-    print("current: " ..
-        tostring(currentGold) ..
-        ", original: " .. tostring(persist.originalValuesMap[data.npc.id]) .. ", max: " .. tostring(data.maxGold))
-    data.npc.type.setBarterGold(data.npc, math.min(currentGold, persist.originalValuesMap[data.npc.id], data.maxGold))
+    if currentGold > originalGold or currentGold > data.maxGold then
+        print(data.npc.recordId .. "- current: " ..
+            tostring(currentGold) ..
+            ", original: " .. tostring(originalGold) .. ", max: " .. tostring(data.maxGold))
+        data.npc.type.setBarterGold(data.npc, math.min(originalGold, data.maxGold))
+        -- notify player to re-open window
+        data.player:sendEvent(MOD_NAME .. "onReOpenBarterWindow", {
+            target = data.npc,
+        })
+    end
 end
 
-local function onUpdate(dt)
-    for _, npc in pairs(tradingNPCs) do
-        if npc then
-            limitGold(npc)
-        end
+local function onBarterStart(data)
+    if not data.npc then
+        error("no npc in data")
+        return
     end
+
+    ensureTimer(data.npc)
+    limitGold(data)
 end
 
 local function onLoad(data)
@@ -111,10 +100,8 @@ end
 return {
     eventHandlers = {
         [MOD_NAME .. "onBarterStart"] = onBarterStart,
-        [MOD_NAME .. "onBarterEnd"] = onBarterEnd,
     },
     engineHandlers = {
-        onUpdate = onUpdate,
         onLoad = onLoad,
         onSave = onSave,
     }
