@@ -22,6 +22,8 @@ local util         = require('openmw.util')
 
 local mainGroupKey = "Settings/" .. MOD_NAME
 
+local maxType            = { "Worst-Of", "Softmax" }
+
 local function init()
     interfaces.Settings.registerPage {
         key = MOD_NAME,
@@ -74,11 +76,12 @@ local function init()
                 }
             },
             {
-                key = "additionalOnlyGold",
-                name = "additionalOnlyGoldName",
-                description = "additionalOnlyGoldDescription",
-                default = false,
-                renderer = "checkbox"
+                key = "maxType",
+                name = "maxType_name",
+                description = "maxType_description",
+                argument = { items = maxType, l10n = MOD_NAME },
+                default = maxType[2],
+                renderer = "select",
             },
             {
                 key = "debug",
