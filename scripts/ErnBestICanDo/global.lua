@@ -40,18 +40,20 @@ local function limitGold(data)
         return
     end
 
-    local newMax = 0
-    if data.additionalOnlyGold then
-        newMax = data.maxGold + originalGold
+    local newCurrentGold = currentGold
+    if data.maxType == "Softmax" then
+        newCurrentGold = math.min(currentGold, data.maxGold + originalGold)
+    elseif data.maxType == "Worst-Of" then
+        newCurrentGold = math.min(originalGold, data.maxGold)
     else
-        newMax = math.min(originalGold, data.maxGold)
+        error("unknown max type: "..tostring(data.maxType))
     end
 
-    if currentGold > newMax then
+    if currentGold ~= newCurrentGold then
         print(data.npc.recordId .. "- current: " ..
             tostring(currentGold) ..
-            ", original: " .. tostring(originalGold) .. ", max: " .. tostring(newMax))
-        data.npc.type.setBarterGold(data.npc, newMax)
+            ", original: " .. tostring(originalGold) .. ", new: " .. tostring(newCurrentGold))
+        data.npc.type.setBarterGold(data.npc, newCurrentGold)
         -- notify player to re-open window
         data.player:sendEvent(MOD_NAME .. "onReOpenBarterWindow", {
             target = data.npc,

@@ -32,7 +32,7 @@ local settingCache = {
     constGold = settings.main.constGold,
     mercMultGold = settings.main.mercMultGold,
     mercSquareMultGold = settings.main.mercSquareMultGold,
-    additionalOnlyGold = settings.main.additionalOnlyGold
+    maxType = settings.main.maxType
 }
 settings.main.subscribe(async:callback(function(_, key)
     settingCache[key] = settings.main[key]
@@ -45,7 +45,7 @@ local function messageData(npc)
         player = pself,
         maxGold = math.ceil(settingCache.constGold + mercSkill * settingCache.mercMultGold +
             mercSkill * mercSkill * settingCache.mercSquareMultGold),
-        additionalOnlyGold = settingCache.additionalOnlyGold,
+        maxType = settingCache.maxType,
     }
 end
 
